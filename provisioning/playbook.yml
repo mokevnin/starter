@@ -1,0 +1,46 @@
+---
+-
+  hosts: all
+  vars:
+    erlang:
+      version: 17.0-rc2
+      directory: ~/.kerl/erlangs
+    erlang_activation: ". {{ erlang.directory }}/{{ erlang.version }}/activate"
+
+  pre_tasks:
+    -
+      name: install packages
+      sudo: yes
+      apt: pkg={{ item }} state=installed
+      with_items:
+        - python-pycurl
+
+  roles:
+    - { role: angstwad.docker_ubuntu, sudo: yes }
+
+  tasks:
+    -
+      name: set locale
+      sudo: yes
+      lineinfile:
+        dest=/etc/environment
+        line='LC_ALL="en_US.UTF-8"'
+        state=present
+        backup=yes
+
+    -
+      name: install packages
+      sudo: yes
+      apt: pkg={{ item }} state=installed
+      with_items:
+        - git
+        - autoconf
+        - curl
+
+    - include: "erlang.yml"
+
+    -
+      name: install ubuntu docker image
+      sudo: yes
+      shell: docker pull ubuntu
+      tags: [docker]

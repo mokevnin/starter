@@ -1,0 +1,55 @@
+-
+  name: setup kerl
+  sudo: yes
+  get_url: url=https://raw.github.com/spawngrid/kerl/master/kerl
+    dest=/usr/local/bin/kerl
+    mode=0755
+  tags: [erlang]
+
+-
+  name: update kerl releases
+  shell: kerl update releases
+  tags: [erlang]
+
+-
+  name: build erlang
+  shell: kerl build {{ erlang.version }} {{ erlang.version }}
+    creates=~/.kerl/builds/{{ erlang.version }}
+  tags: [erlang]
+
+-
+  name: setup erlang
+  shell: kerl install {{ erlang.version }} {{ erlang.directory }}/{{ erlang.version }}
+    creates={{ erlang.directory }}/{{ erlang.version }}
+  tags: [erlang]
+
+-
+  name: update bash_profile (erlang activation)
+  lineinfile:
+    dest=~/.bash_profile
+    regexp="{{ erlang.directory }}/(.+)/activate"
+    line=". {{ erlang.directory }}/{{ erlang.version }}/activate"
+    state=present
+    backup=yes
+    insertafter=EOF
+    create=yes
+  tags: [erlang]
+
+-
+  name: download rebar
+  git: repo=https://github.com/rebar/rebar.git
+    dest=~/rebar
+  tags: [erlang, rebar]
+
+-
+  name: make rebar
+  shell: "{{ erlang_activation }} && cd rebar && ./bootstrap"
+  tags: [erlang, rebar]
+
+-
+  name: install rebar
+  sudo: yes
+  file: src=/home/vagrant/rebar/rebar
+    dest=/usr/local/bin/rebar
+    state=hard
+  tags: [erlang, rebar]
