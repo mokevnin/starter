@@ -14,7 +14,7 @@
   {env, [
     {docker_image, "mokevnin/starter"},
     {pools, [
-      {default, [
+      {starter, [
         {size, 10},
         {max_overflow, 5}
         ], [
