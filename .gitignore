@@ -2,3 +2,5 @@ deps
 .vagrant
 *.dump
 *.beam
+.rebar
+log

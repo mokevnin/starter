@@ -1,5 +1,14 @@
-FROM      ubuntu
+FROM      ubuntu:saucy
 MAINTAINER mokevnin
 
-RUN apt-get install -y curl
-RUN curl -sSL https://get.rvm.io | bash -s stable --ruby
+RUN apt-get update
+
+RUN apt-get install -y python-software-properties software-properties-common g++ make
+
+RUN add-apt-repository ppa:chris-lea/node.js
+
+RUN apt-get update
+
+RUN apt-get install -y ruby1.9.3
+
+RUN apt-get install -y nodejs

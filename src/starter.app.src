@@ -5,8 +5,20 @@
   {registered, []},
   {applications, [
                   kernel,
-                  stdlib
+                  stdlib,
+                  lager,
+                  sasl,
+                  poolboy,
+                  exec
                  ]},
   {mod, { starter_app, []}},
-  {env, []}
+  {env, [
+    {pools, [
+      {default, [
+        {size, 10},
+        {max_overflow, 5}
+        ], [
+      ]}
+    ]}
+  ]}
  ]}.

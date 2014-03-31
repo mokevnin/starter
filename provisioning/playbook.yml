@@ -14,9 +14,10 @@
       apt: pkg={{ item }} state=installed
       with_items:
         - python-pycurl
+        - python-software-properties
 
-  roles:
-    - { role: angstwad.docker_ubuntu, sudo: yes }
+  # roles:
+  #   - { role: angstwad.docker_ubuntu, sudo: yes }
 
   tasks:
     -
@@ -29,6 +30,11 @@
         backup=yes
 
     -
+      name: apt-get update
+      sudo: yes
+      apt: update_cache=true cache_valid_time=3600
+
+    -
       name: install packages
       sudo: yes
       apt: pkg={{ item }} state=installed
@@ -36,11 +42,12 @@
         - git
         - autoconf
         - curl
+        - socat
 
     - include: "erlang.yml"
 
-    -
-      name: install ubuntu docker image
-      sudo: yes
-      shell: docker pull ubuntu
-      tags: [docker]
+    # -
+    #   name: install ubuntu docker image
+    #   sudo: yes
+    #   shell: docker pull ubuntu
+    #   tags: [docker]

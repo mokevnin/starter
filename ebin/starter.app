@@ -2,7 +2,8 @@
              [{description,[]},
               {vsn,"1"},
               {registered,[]},
-              {applications,[kernel,stdlib]},
+              {applications,[kernel,stdlib,lager,sasl,poolboy,exec]},
               {mod,{starter_app,[]}},
-              {env,[]},
-              {modules,[starter_app,starter_sup]}]}.
+              {env,[{pools,[{default,[{size,10},{max_overflow,5}],[]}]}]},
+              {modules,[langs,starter,starter_app,starter_pool,starter_sup,
+                        starter_worker]}]}.
