@@ -8,7 +8,6 @@
                   stdlib,
                   lager,
                   sasl,
-                  poolboy,
                   exec
                  ]},
   {mod, { starter_app, []}},

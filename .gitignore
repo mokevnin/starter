@@ -4,3 +4,4 @@ deps
 *.beam
 .rebar
 log
+ebin
