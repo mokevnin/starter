@@ -12,6 +12,7 @@
                  ]},
   {mod, { starter_app, []}},
   {env, [
+    {docker_image, "mokevnin/starter"},
     {pools, [
       {default, [
         {size, 10},
