@@ -4,4 +4,4 @@
 
 start() ->
   sync:go(),
-  {ok, _} = application:ensure_all_started(starter).
+  {ok, _} = application:ensure_all_started(?MODULE).
