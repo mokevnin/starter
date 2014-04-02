@@ -24,6 +24,9 @@ compileapp:
 	$(REBAR) compile skip_deps=true
 
 run: cleanapp compileapp
+	erl -config $(CURDIR)/sys -pa ebin deps/*/ebin -s starter
+
+macrun: cleanapp compileapp
 	boot2docker start
 	export DOCKER_HOST=tcp://localhost:4243
 	erl -config $(CURDIR)/sys -pa ebin deps/*/ebin -s starter
