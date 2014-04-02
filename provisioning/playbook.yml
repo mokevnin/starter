@@ -2,10 +2,7 @@
 -
   hosts: all
   vars:
-    erlang:
-      version: 17.0-rc2
-      directory: ~/.kerl/erlangs
-    erlang_activation: ". {{ erlang.directory }}/{{ erlang.version }}/activate"
+    erlang_version: R16B03-1
 
   pre_tasks:
     -
@@ -16,8 +13,9 @@
         - python-pycurl
         - python-software-properties
 
-  # roles:
-  #   - { role: angstwad.docker_ubuntu, sudo: yes }
+  roles:
+    - { role: angstwad.docker_ubuntu, sudo: yes }
+    - { role: Ansibles.erlang, sudo: yes }
 
   tasks:
     -
@@ -28,6 +26,13 @@
         line='LC_ALL="en_US.UTF-8"'
         state=present
         backup=yes
+
+    -
+      name: add repositories
+      sudo: yes
+      apt_repository: repo={{ item }}
+      with_items:
+        - "ppa:brightbox/ruby-ng"
 
     -
       name: apt-get update
@@ -43,11 +48,53 @@
         - autoconf
         - curl
         - socat
+        - libcap-dev
+        - ruby2.1
+        - ruby2.1-dev
+        - rubygems
+        - ruby-switch
 
-    - include: "erlang.yml"
+    -
+      name: switch ruby
+      sudo: yes
+      shell: ruby-switch --set ruby2.1
+    -
+      name: install gems
+      sudo: yes
+      gem: name=rake state=present user_install=no
 
-    # -
-    #   name: install ubuntu docker image
-    #   sudo: yes
-    #   shell: docker pull ubuntu
-    #   tags: [docker]
+    -
+      name: add docker group
+      sudo: yes
+      group: name=docker state=present
+      tags: [docker]
+    -
+      name: add docker group to user
+      sudo: yes
+      user: name=vagrant append=yes groups=docker
+      notify: "Start Docker"
+      tags: [docker]
+    -
+      name: install ubuntu docker image
+      shell: docker pull mokevnin/starter
+      tags: [docker]
+
+    -
+      name: install rebar
+      sudo: yes
+      get_url: url=https://github.com/rebar/rebar/wiki/rebar
+        dest=/usr/local/bin/rebar
+
+    -
+      name: download erlang-history
+      git: repo=https://github.com/ferd/erlang-history.git
+        dest=/var/tmp/erlang-history
+      tags: [erlang]
+    -
+      name: make erlang-history
+      shell: cd /var/tmp/erlang-history && make
+      tags: [erlang]
+    -
+      name: install erlang-history
+      shell: cd /var/tmp/erlang-history && sudo make install
+      tags: [erlang]
