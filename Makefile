@@ -1,12 +1,12 @@
 REBAR="rebar"
 
-all: get-deps compile
+all: get-deps compile makedir
 
 pull-image:
 	docker pull mokevnin/starter
 
 build-image:
-	docker build -rm -t="mokevnin/starter" ./priv
+	docker build --rm -t="mokevnin/starter" ./priv
 
 clean:
 	$(REBAR) clean
@@ -33,5 +33,8 @@ macrun: cleanapp compileapp
 	boot2docker start
 	export DOCKER_HOST=tcp://localhost:4243
 	erl -config $(CURDIR)/sys -pa ebin deps/*/ebin -s starter
+
+makedir:
+	if [ ! -d /tmp/starter ]; then mkdir "/tmp/starter"; fi
 
 .PHONY: test

@@ -29,4 +29,6 @@ init([]) ->
                                         {worker_module, starter_worker}] ++ SizeArgs,
                             poolboy:child_spec(Name, PoolArgs, WorkerArgs)
                         end, Pools),
-  {ok, {{one_for_one, 10, 10}, PoolSpecs}}.
+  Workers = [?CHILD(files_cleaner, worker) | PoolSpecs],
+
+  {ok, {{one_for_one, 10, 10}, Workers}}.

@@ -11,7 +11,7 @@
 start_link(Args) ->
   gen_server:start_link(?MODULE, Args, []).
 
-init(Args) ->
+init(_Args) ->
   process_flag(trap_exit, true),
 
   Waiting = queue:new(),
@@ -21,13 +21,16 @@ handle_call({evaluate, Lang, Code}, From, State) ->
   #state{waiting=Waiting} = State,
 
   {ok, DockerImage} = application:get_env(starter, docker_image),
-  UUID = uuid:to_string(uuid:uuid1()),
-  Runner = "docker run",
-  LangCommand = langs:command(Lang, Code),
-  DockerCommand = lists:concat([Runner, " ", DockerImage, " ", LangCommand, "; echo '", UUID, "'"]),
+  {ok, StorageDir} = application:get_env(starter, storage_dir),
 
-  lager:debug([DockerCommand]),
-  exec:run(DockerCommand, [stdout, stderr]),
+  UUID = uuid:to_string(uuid:uuid1()),
+  FilePath = lists:concat([StorageDir, "/", UUID]),
+  ok = file:write_file(FilePath, Code),
+  LangCommand = langs:command(Lang, FilePath),
+  Runner = io_lib:format("docker run -v ~s:~s:ro", [StorageDir, StorageDir]),
+  DockerCommand = io_lib:format("~s ~s ~s; echo ~s", [Runner, DockerImage, LangCommand, UUID]),
+
+  {ok, _, _} = exec:run(lists:flatten(DockerCommand), [stdout, stderr]),
   NewWaiting = queue:in({From, UUID, [], []}, Waiting),
   {noreply, State#state{waiting=NewWaiting}};
 
@@ -40,10 +43,8 @@ handle_cast(_Msg, State) ->
 handle_info({Channel, _, Data}, #state{waiting=Waiting} = State)
   when Channel == stdout orelse Channel == stderr ->
 
-  {{value, {From, UUID, Stdout, Stderr}} = Member, WaitingWithoutCurr} = queue:out(Waiting),
+  {{value, {From, UUID, Stdout, Stderr}}, WaitingWithoutCurr} = queue:out(Waiting),
 
-  %% lager:debug("~p", [Member]),
-  %% lager:debug("~p", [Msg]),
 
   EofMarker =list_to_binary([UUID, "\n"]),
   NewWaiting = case {Channel, Data} of
@@ -62,10 +63,11 @@ handle_info({Channel, _, Data}, #state{waiting=Waiting} = State)
                end,
   {noreply, State#state{waiting=NewWaiting}};
 
-handle_info(_Info, State) ->
+handle_info(_Msg, State) ->
+  %% lager:debug("uncactched msg: ~p", [Msg]),
   {noreply, State}.
 
-terminate(_Reason, State) ->
+terminate(_Reason, _State) ->
   ok.
 
 code_change(_OldVsn, State, _Extra) ->
