@@ -22,7 +22,7 @@ handle_call({evaluate, Lang, Code}, From, State) ->
 
   {ok, DockerImage} = application:get_env(starter, docker_image),
   UUID = uuid:to_string(uuid:uuid1()),
-  Runner = "DOCKER_HOST=tcp://localhost:4243 docker run",
+  Runner = "docker run",
   LangCommand = langs:command(Lang, Code),
   DockerCommand = lists:concat([Runner, " ", DockerImage, " ", LangCommand, "; echo '", UUID, "'"]),
 
@@ -37,22 +37,26 @@ handle_call(_Request, _From, State) ->
 handle_cast(_Msg, State) ->
   {noreply, State}.
 
-handle_info(Msg, #state{waiting=Waiting} = State) ->
+handle_info({Channel, _, Data}, #state{waiting=Waiting} = State)
+  when Channel == stdout orelse Channel == stderr ->
+
   {{value, {From, UUID, Stdout, Stderr}} = Member, WaitingWithoutCurr} = queue:out(Waiting),
 
   %% lager:debug("~p", [Member]),
   %% lager:debug("~p", [Msg]),
 
   EofMarker =list_to_binary([UUID, "\n"]),
-  NewWaiting = case Msg of
-                 {stdout, _, EofMarker} ->
-                   Reply = [{stderr, list_to_binary(Stderr)}, {stdout, list_to_binary(Stdout)}],
+  NewWaiting = case {Channel, Data} of
+                 {stdout, EofMarker} ->
+                   MergedStderr = list_to_binary(lists:reverse(Stderr)),
+                   MergedStdout = list_to_binary(lists:reverse(Stdout)),
+                   Reply = [{stderr, MergedStderr}, {stdout, MergedStdout}],
                    gen_server:reply(From, Reply),
                    WaitingWithoutCurr;
-                 {stdout, _, Data} ->
+                 {stdout, Data} ->
                    Item = {From, UUID, [Data | Stdout], Stderr},
                    queue:in_r(Item, WaitingWithoutCurr);
-                 {stderr, _, Data} ->
+                 {stderr, Data} ->
                    Item = {From, UUID, Stdout, [Data | Stderr]},
                    queue:in_r(Item, WaitingWithoutCurr)
                end,

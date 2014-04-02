@@ -5,3 +5,4 @@ deps
 .rebar
 log
 ebin
+.eunit
