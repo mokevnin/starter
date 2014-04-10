@@ -35,6 +35,6 @@ macrun: cleanapp compileapp
 	erl -config $(CURDIR)/sys -pa ebin deps/*/ebin -s starter
 
 makedir:
-	if [ ! -d /tmp/starter ]; then mkdir "/tmp/starter"; fi
+	if [ ! -d /var/tmp/starter ]; then mkdir "/var/tmp/starter"; fi
 
 .PHONY: test
