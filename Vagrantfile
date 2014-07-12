@@ -10,7 +10,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # please see the online documentation at vagrantup.com.
 
   # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box = "chef/ubuntu-13.10"
+  config.vm.box = "chef/ubuntu-14.04"
 
   # The url from where the 'config.vm.box' box will be fetched if it
   # doesn't already exist on the user's system.
@@ -116,11 +116,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   #
   #   chef.validation_client_name = "ORGNAME-validator"
 
-  config.vm.synced_folder ".", "/vagrant", type: "rsync", disabled: true
+  # config.vm.synced_folder ".", "/vagrant", type: "rsync", disabled: true
 
   # config.vm.provision "docker", images: ["ubuntu"]
 
   config.vm.provision "ansible" do |ansible|
-    ansible.playbook = "provisioning/playbook.yml"
+    ansible.playbook = "cm/playbook.yml"
   end
 end

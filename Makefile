@@ -1,12 +1,9 @@
-REBAR="rebar"
+REBAR="./rebar"
 
 all: get-deps compile makedir
 
 pull-image:
 	docker pull mokevnin/starter
-
-push-image:
-	docker push mokevnin/starter
 
 build-image:
 	docker build --rm -t="mokevnin/starter" ./priv
@@ -32,10 +29,10 @@ test: compileapp
 run: cleanapp compileapp
 	erl -config $(CURDIR)/sys -pa ebin deps/*/ebin -s starter
 
-macrun: cleanapp compileapp
-	boot2docker start
-	DOCKER_HOST=tcp://$(boot2docker ip 2>/dev/null):2375
-	erl -config $(CURDIR)/sys -pa ebin deps/*/ebin -s starter
+# macrun: cleanapp compileapp
+# 	boot2docker start
+# 	DOCKER_HOST=tcp://$(boot2docker ip 2>/dev/null):2375
+# 	erl -config $(CURDIR)/sys -pa ebin deps/*/ebin -s starter
 
 makedir:
 	if [ ! -d /var/tmp/starter ]; then mkdir "/var/tmp/starter"; fi

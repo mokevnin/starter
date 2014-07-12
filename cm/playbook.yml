@@ -2,7 +2,7 @@
 -
   hosts: all
   vars:
-    erlang_version: R16B03-1
+    erlang_version: 17.1
 
   pre_tasks:
     -
@@ -16,6 +16,7 @@
   roles:
     - { role: angstwad.docker_ubuntu, sudo: yes }
     - { role: Ansibles.erlang, sudo: yes }
+    # - { role: zzet.rbenv, sudo: yes }
 
   tasks:
     -
@@ -27,12 +28,12 @@
         state=present
         backup=yes
 
-    -
-      name: add repositories
-      sudo: yes
-      apt_repository: repo={{ item }}
-      with_items:
-        - "ppa:brightbox/ruby-ng"
+    # -
+    #   name: add repositories
+    #   sudo: yes
+    #   apt_repository: repo={{ item }}
+    #   with_items:
+    #     - "ppa:brightbox/ruby-ng"
 
     -
       name: apt-get update
@@ -49,19 +50,11 @@
         - curl
         - socat
         - libcap-dev
-        - ruby2.1
-        - ruby2.1-dev
-        - rubygems
-        - ruby-switch
 
-    -
-      name: switch ruby
-      sudo: yes
-      shell: ruby-switch --set ruby2.1
-    -
-      name: install gems
-      sudo: yes
-      gem: name=rake state=present user_install=no
+    # -
+    #   name: install gems
+    #   sudo: yes
+    #   gem: name=rake state=present user_install=no
 
     -
       name: add docker group
@@ -75,15 +68,9 @@
       notify: "Start Docker"
       tags: [docker]
     -
-      name: install ubuntu docker image
+      name: install starter docker image
       shell: docker pull mokevnin/starter
       tags: [docker]
-
-    -
-      name: install rebar
-      sudo: yes
-      get_url: url=https://github.com/rebar/rebar/wiki/rebar
-        dest=/usr/local/bin/rebar
 
     -
       name: download erlang-history
