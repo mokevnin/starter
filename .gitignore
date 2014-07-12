@@ -6,3 +6,5 @@ deps
 log
 ebin
 .eunit
+*.swp
+*.swo

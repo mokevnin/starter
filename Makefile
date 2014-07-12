@@ -5,6 +5,9 @@ all: get-deps compile makedir
 pull-image:
 	docker pull mokevnin/starter
 
+push-image:
+	docker push mokevnin/starter
+
 build-image:
 	docker build --rm -t="mokevnin/starter" ./priv
 
@@ -31,7 +34,7 @@ run: cleanapp compileapp
 
 macrun: cleanapp compileapp
 	boot2docker start
-	export DOCKER_HOST=tcp://localhost:4243
+	DOCKER_HOST=tcp://$(boot2docker ip 2>/dev/null):2375
 	erl -config $(CURDIR)/sys -pa ebin deps/*/ebin -s starter
 
 makedir:
