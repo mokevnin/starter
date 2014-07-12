@@ -1,5 +1,4 @@
-{application, starter,
- [
+{application, starter, [
   {description, ""},
   {vsn, "1"},
   {registered, []},

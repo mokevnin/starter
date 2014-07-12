@@ -23,12 +23,12 @@ start_link() ->
 %% ===================================================================
 
 init([]) ->
-  {ok, Pools} = application:get_env(starter, pools),
-  PoolSpecs = lists:map(fun({Name, SizeArgs, WorkerArgs}) ->
-                            PoolArgs = [{name, {local, Name}},
-                                        {worker_module, starter_worker}] ++ SizeArgs,
-                            poolboy:child_spec(Name, PoolArgs, WorkerArgs)
-                        end, Pools),
-  Workers = [?CHILD(files_cleaner, worker) | PoolSpecs],
+    {ok, Pools} = application:get_env(starter, pools),
+    PoolSpecs = lists:map(fun({Name, SizeArgs, WorkerArgs}) ->
+                                  PoolArgs = [{name, {local, Name}},
+                                              {worker_module, starter_worker}] ++ SizeArgs,
+                                  poolboy:child_spec(Name, PoolArgs, WorkerArgs)
+                          end, Pools),
+    Workers = [?CHILD(files_cleaner, worker) | PoolSpecs],
 
-  {ok, {{one_for_one, 10, 10}, Workers}}.
+    {ok, {{one_for_one, 10, 10}, Workers}}.

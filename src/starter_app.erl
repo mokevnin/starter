@@ -10,7 +10,7 @@
 %% ===================================================================
 
 start(_StartType, _StartArgs) ->
-  starter_sup:start_link().
+    starter_sup:start_link().
 
 stop(_State) ->
-  ok.
+    ok.
