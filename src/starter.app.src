@@ -1,6 +1,6 @@
 {application, starter, [
   {description, ""},
-  {vsn, "1"},
+  {vsn, git},
   {registered, []},
   {applications, [
                   kernel,
@@ -8,6 +8,8 @@
                   lager,
                   sasl,
                   exec,
+                  poolboy,
+                  uuid,
                   cowboy
                  ]},
   {mod, { starter_app, []}},

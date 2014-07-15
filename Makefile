@@ -1,6 +1,7 @@
 REBAR="./rebar"
+RELX="./relx"
 
-all: get-deps compile makedir
+all: clean get-deps compile makedir
 
 pull-image:
 	docker pull mokevnin/starter
@@ -10,6 +11,9 @@ build-image:
 
 clean:
 	$(REBAR) clean
+
+release: compile
+	$(RELX)
 
 get-deps:
 	$(REBAR) get-deps
