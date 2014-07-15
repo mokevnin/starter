@@ -10,6 +10,7 @@
                   exec,
                   poolboy,
                   uuid,
+                  jsx,
                   cowboy
                  ]},
   {mod, { starter_app, []}},
