@@ -12,7 +12,7 @@ build-image:
 clean:
 	$(REBAR) clean
 
-release: compile
+release: clean cleanrel compile
 	$(RELX)
 
 get-deps:
@@ -20,6 +20,9 @@ get-deps:
 
 compile:
 	$(REBAR) compile
+
+cleanrel:
+	rm -rf _rel
 
 cleanapp:
 	$(REBAR) clean skip_deps=true
